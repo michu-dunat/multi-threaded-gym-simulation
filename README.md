@@ -23,7 +23,9 @@ set FLASK_APP=hello.py
 ```
 
 **MAC/Linux:**
-```export FLASK_APP=app.py```
+```
+export FLASK_APP=app.py
+```
 
 ### Run application
 ```
