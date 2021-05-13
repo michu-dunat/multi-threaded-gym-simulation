@@ -1,27 +1,35 @@
 from threading import Thread, Condition
-from app import locker_lock
+from time import sleep
+
 class GenericMember(Thread):
-    def __init__(self, reception):
+    def __init__(self, pid, reception):
         super().__init__(target=self.execute_training_plan)
-        self.condition = Condition()        
+        self.pid = pid
+        self.condition = Condition()
         self.receptionist = reception
         self.locker = None
         pass
 
     def execute_training_plan(self):
+        self.enter_gym()
         pass
 
-    def exit_gym():
-        pass
+
+    def exit_gym(self):
+        print(f"Wychodzę {self.pid}")
 
 
-    def enter_gym():
-        free_locker = self.receptionist.ask()
+    def enter_gym(self):
+        print(f"Wchodzę, {self.pid}")
+        self.locker = self.receptionist.ask_to_enter()
         attempt = 0
-        if(free_locker):
-            self.locker = free_locker
-            locker_lock.release()
-        
+        if(self.locker):
+            print(f"Wziąłem szafkę {self.pid}")
+
+            self.locker.take()
+            sleep(5)
+            self.locker.release()
+            self.exit_gym()
         else:
             self.exit_gym()
         pass

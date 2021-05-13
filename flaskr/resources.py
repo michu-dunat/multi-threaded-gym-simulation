@@ -1,3 +1,20 @@
+from threading import Lock, Condition
+
+
+class Locker:
+    def __init__(self):
+        self.status = "free"
+        self.condition = Condition()
+        self.lock = Lock()            
+
+    def take(self):
+        with self.lock:
+            self.status="taken"
+
+    def release(self):
+        with self.lock:
+            self.status="free"
+
 class Threadmill:
     def __init__(self):
         pass
@@ -26,11 +43,6 @@ class Bar_position:
 class Excercise_position:
     def __init__(self):
         pass
-
-
-class Locker:
-    def __init__(self):
-        self.status = "free"
 
 
 class Equipement:
