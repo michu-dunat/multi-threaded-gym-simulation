@@ -1,28 +1,73 @@
-from threading import Lock, Condition
+from random import uniform
+from threading import Condition
+from time import sleep
 
+
+class LockContextManager():
+    def __init__(self) -> None:
+        pass
+
+    def __enter__(self):
+        print("entering")
+
+    def __exit__(self, type, value, traceback):
+        print("exiting")
 
 class Locker:
     def __init__(self):
-        self.status = "free"
+        self.owner = None
         self.condition = Condition()
-        self.lock = Lock()            
-
-    def take(self):
-        with self.lock:
-            self.status="taken"
 
     def release(self):
-        with self.lock:
-            self.status="free"
+        with self.condition:
+            self.owner = None
+            self.condition.notify_all()
 
-class Threadmill:
-    def __init__(self):
-        pass
+    def assign_or_wait(self, gym_member):
+        with self.condition:
+            if self.owner is not None:
+                gym_member.condition.wait()
+                return False
+            else:
+                self.owner = gym_member
+                return True
 
 
-class Ergometer:
-    def __init__(self):
-        pass
+class CardioEquipement:
+    def __init__(self, eq_count, name):
+        self.condition = Condition()
+        self.array = [True for _ in range(eq_count)]
+        self.name = name
+    
+    def __str__(self) -> str:
+        return self.name
+
+    def start_training(self, g):
+        with self.condition:
+            while not any(self.array):
+                self.condition.wait()
+        
+            for eq in range(len(self.array)):
+                if self.array[eq]:
+                    print(f"{g.pid} Took {self}")
+                    self.array[eq] = False 
+                    return eq
+
+    def stop_training(self, g):
+        with self.condition:
+            print(g.pid, f" Zwolnił {self}")
+            self.array[g.eid] = True
+            self.condition.notify_all()
+            
+
+class Threadmill(CardioEquipement):
+    def __init__(self, eq_count):
+        CardioEquipement.__init__(self, eq_count, "Threadmill")
+
+
+class Ergometer(CardioEquipement):
+    def __init__(self, eq_count):
+        CardioEquipement.__init__(self, eq_count, "Ergometer")
 
 
 class Benchpress:

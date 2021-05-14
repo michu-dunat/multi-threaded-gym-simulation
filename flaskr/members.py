@@ -1,35 +1,37 @@
 from threading import Thread, Condition
 from time import sleep
+from random import uniform
 
 class GenericMember(Thread):
-    def __init__(self, pid, reception):
-        super().__init__(target=self.execute_training_plan)
+    def __init__(self, pid, gym):
+        super().__init__(target=self.run)
         self.pid = pid
         self.condition = Condition()
-        self.receptionist = reception
-        self.locker = None
+        self.locker_number = -1
+        self.attempts = 0
+        self.eid = -1
+        self.gym = gym
         pass
+
+    def run(self):
+        self.enter_gym()
+        if self.locker_number != -1:
+            self.execute_training_plan()
+        self.exit_gym()
 
     def execute_training_plan(self):
-        self.enter_gym()
-        pass
-
+        sleep(uniform(1,2))
+        self.gym.threadmills.start_training(self)
+        sleep(uniform(4,10))
+        self.gym.threadmills.stop_training(self)
+        sleep(uniform(1,2))
 
     def exit_gym(self):
-        print(f"Wychodzę {self.pid}")
-
+        if self.locker_number != -1:
+            self.gym.reception.release_locker(self)
+            print(f"Wychodzę po treningu {self.pid}")
+        else:
+            print(f"Nie chce mi się czekać {self.pid}")
 
     def enter_gym(self):
-        print(f"Wchodzę, {self.pid}")
-        self.locker = self.receptionist.ask_to_enter()
-        attempt = 0
-        if(self.locker):
-            print(f"Wziąłem szafkę {self.pid}")
-
-            self.locker.take()
-            sleep(5)
-            self.locker.release()
-            self.exit_gym()
-        else:
-            self.exit_gym()
-        pass
+        self.locker_number = self.gym.reception.ask_to_enter(self)
