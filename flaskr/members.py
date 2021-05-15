@@ -11,20 +11,24 @@ class GenericMember(Thread):
         self.attempts = 0
         self.eid = -1
         self.gym = gym
-        pass
+        self.list_of_excercises=[]
 
     def run(self):
         self.enter_gym()
         if self.locker_number != -1:
+            sleep(uniform(2,3))
             self.execute_training_plan()
+            sleep(uniform(3,4))
         self.exit_gym()
 
     def execute_training_plan(self):
-        sleep(uniform(1,2))
-        self.gym.threadmills.start_training(self)
-        sleep(uniform(4,10))
-        self.gym.threadmills.stop_training(self)
-        sleep(uniform(1,2))
+        for ex in self.list_of_excercises:
+            self.train(ex,1,10)
+
+    def train(self, equipment, min_occupation_time, max_occupation_time):
+        equipment.start_training(self)
+        sleep(uniform(min_occupation_time,max_occupation_time))
+        equipment.stop_training(self)
 
     def exit_gym(self):
         if self.locker_number != -1:
@@ -35,3 +39,24 @@ class GenericMember(Thread):
 
     def enter_gym(self):
         self.locker_number = self.gym.reception.ask_to_enter(self)
+
+
+class CardioFreak(GenericMember):
+    def __init__(self, pid, gym):
+        super().__init__(pid, gym)
+        self.list_of_excercises = [
+            self.gym.bicycles,
+            self.gym.ergometers,
+            self.gym.threadmills,
+            self.gym.elipticals
+            ]
+
+class CallisctenicsEnjoyer(GenericMember):
+    def __init__(self, pid, gym):
+        super().__init__(pid, gym)
+        self.list_of_excercises = [
+            self.gym.threadmills,
+            self.gym.pullup_bars,
+            self.gym.ergometers,
+            self.gym.crunch_machines,
+            ]

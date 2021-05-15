@@ -62,12 +62,12 @@ class CardioEquipement:
 
 class Threadmill(CardioEquipement):
     def __init__(self, eq_count):
-        CardioEquipement.__init__(self, eq_count, "Threadmill")
+        super().__init__(eq_count, "Threadmill")
 
 
 class Ergometer(CardioEquipement):
     def __init__(self, eq_count):
-        CardioEquipement.__init__(self, eq_count, "Ergometer")
+        super().__init__(eq_count, "Ergometer")
 
 
 class Benchpress:
@@ -75,9 +75,18 @@ class Benchpress:
         pass
 
 
-class Bicycle:
-    def __init__():
-        pass
+class Bicycle(CardioEquipement):
+    def __init__(self, eq_count):
+        super().__init__(eq_count, "Bicycle")
+
+class CrunchMachine(CardioEquipement):
+    def __init__(self, eq_count):
+        super().__init__(eq_count, "Crunch Machine")
+
+
+class Eliptical(CardioEquipement):
+    def __init__(self, eq_count):
+        super().__init__(eq_count, "Eliptical")
 
 
 class Bar_position:
@@ -90,11 +99,11 @@ class Excercise_position:
         pass
 
 
-class Equipement:
-    def __init__(self):
-        pass
-
-
 class Fitness_room:
     def __init__(self):
         pass
+
+
+class PullUpBar(CardioEquipement):
+    def __init__(self, eq_count):
+        super().__init__(eq_count, "Pull Up Bar")
