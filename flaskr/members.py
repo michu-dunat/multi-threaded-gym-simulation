@@ -1,17 +1,24 @@
 from threading import Thread, Condition
 from time import sleep
-from random import uniform
+from random import randint, uniform, sample
 
 class GenericMember(Thread):
-    def __init__(self, pid, gym):
+    def __init__(self, pid, gym, dw, gm_type):
         super().__init__(target=self.run)
         self.pid = pid
         self.condition = Condition()
         self.locker_number = -1
         self.attempts = 0
         self.eid = -1
+        self.desired_weight = dw
         self.gym = gym
         self.list_of_excercises=[]
+        self.type = gm_type
+
+        if randint(0,1) == 0:
+            self.sex = "m"
+        else: 
+            self.sex = "f"
 
     def run(self):
         self.enter_gym()
@@ -33,30 +40,50 @@ class GenericMember(Thread):
     def exit_gym(self):
         if self.locker_number != -1:
             self.gym.reception.release_locker(self)
-            print(f"Wychodzę po treningu {self.pid}")
+            print(f"{self}: Wychodzę po treningu")
         else:
-            print(f"Nie chce mi się czekać {self.pid}")
+            print(f"{self}: Nie chce mi się czekać")
 
     def enter_gym(self):
         self.locker_number = self.gym.reception.ask_to_enter(self)
 
+    def __str__(self):
+        return f"Member {self.type} {self.pid}"
+
 
 class CardioFreak(GenericMember):
     def __init__(self, pid, gym):
-        super().__init__(pid, gym)
-        self.list_of_excercises = [
+        super().__init__(pid, gym, randint(40,70), "CardioFreak")
+        l = [
             self.gym.bicycles,
             self.gym.ergometers,
             self.gym.threadmills,
-            self.gym.elipticals
-            ]
+            self.gym.elipticals,
+            self.gym.deadlift
+        ]
+        self.list_of_excercises = sample(l, len(l))
 
 class CallisctenicsEnjoyer(GenericMember):
     def __init__(self, pid, gym):
-        super().__init__(pid, gym)
-        self.list_of_excercises = [
+        super().__init__(pid, gym, randint(85,100), "CallistenicsEnj")
+        l = [
             self.gym.threadmills,
             self.gym.pullup_bars,
             self.gym.ergometers,
+            self.gym.benchpresses,
             self.gym.crunch_machines,
-            ]
+        ]
+        self.list_of_excercises = sample(l, len(l))
+
+class GymChad(GenericMember):
+    def __init__(self, pid, gym):
+        super().__init__(pid, gym, randint(100,200), "GymChad")
+        l = [
+            self.gym.benchpresses,
+            self.gym.pullup_bars,
+            self.gym.crunch_machines,
+            self.gym.benchpresses,
+            self.gym.deadlift,
+            self.gym.smith
+        ]
+        self.list_of_excercises = sample(l, len(l))
