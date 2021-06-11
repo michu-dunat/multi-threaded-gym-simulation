@@ -1,40 +1,100 @@
 #!/usr/bin/env python
 
+import threading
+from time import sleep
 from gym import Gym
 from flask import Flask, request, render_template
 from flask_socketio import SocketIO, emit
 #from threading import Lock
-from resources import Locker, LockContextManager
 from members import GenericMember, GymChad, CallisctenicsEnjoyer, CardioFreak
-from random import sample
+from random import random, sample, randint
+from random import uniform
+
+gym = Gym()
+
+class Host(threading.Thread):
+    def __init__(self) -> None:
+        super().__init__(target=self.invite_following_customers)
+        self.MEMBERS = list()
+        self.condition = threading.Condition()
+        self.gym_member_id = 0
+
+    def add_member(self, m):
+        with self.condition:
+            self.MEMBERS.append(m)
+            self.MEMBERS[-1].start()
+            
+    def remove_member(self, m):
+        with self.condition:
+            self.MEMBERS.remove(m)
+    
+    def invite_following_customers(self):
+        global gym
+        sleep(20)
+        while True:
+            sleep(uniform(2,3))
+            rnd = randint(0, 100)
+            if rnd % 3 == 0:
+                self.add_member(CallisctenicsEnjoyer(self.gym_member_id, gym, self))
+                self.gym_member_id+=1
+            elif rnd % 3 == 1:
+                self.add_member(CardioFreak(self.gym_member_id,gym, self))
+                self.gym_member_id+=1
+            else:
+                self.add_member(GymChad(self.gym_member_id,gym, self))
+                self.gym_member_id+=1
+    
+    def gym_members_statuses_to_dict(self) -> dict:
+        with self.condition:
+            x = {
+                f"member-{m.pid}":
+                {
+                    "status": m.status
+                } 
+                for m in self.MEMBERS
+            }
+            return x
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = "key"
 socketio = SocketIO(app)
 MEMBERS_LIMIT = 10
 MEMBERS = list()
+TRIGGER_END_EVENT = False
+gym_member_id = 0
+
+gym_host = Host()
+gym_host.start()
 
 @app.route('/')
 def index():
-    return render_template('index.html', context={'members': MEMBERS})
+    return render_template('index.html', context={'members': gym_host.MEMBERS})
 
 @socketio.on('run')
 def run():
-    global MEMBERS_LIMIT, MEMBERS
-    gym = Gym()
+    global MEMBERS_LIMIT, MEMBERS, TRIGGER_END_EVENT, gym_member_id, gym, gym_host
     for i in range(0, MEMBERS_LIMIT+5, 3):
-        MEMBERS.append(CallisctenicsEnjoyer(i, gym))
-        MEMBERS.append(CardioFreak(i+1, gym))
-        MEMBERS.append(GymChad(i+2, gym))
-        MEMBERS = sample(MEMBERS, len(MEMBERS))
-    for m in MEMBERS:
-        m.start()
+        gym_host.add_member(CallisctenicsEnjoyer(i, gym, host=gym_host))
+        gym_host.add_member(CardioFreak(i+1, gym, host=gym_host))
+        gym_host.add_member(GymChad(i+2, gym, host=gym_host))
+        gym_host.MEMBERS = sample(gym_host.MEMBERS, len(gym_host.MEMBERS))
+        gym_host.gym_member_id = i+3
     socketio.run(app)
     
 @socketio.on('connection')
 def connected(json):
     print("Initialized connection")
-    global MEMBERS_LIMIT
+    print(json)
+    socketio.emit('updating', {"start":"gym"})
+
+@socketio.on("update_received")
+def request_update():
+    socketio.emit('request_update')
+
+@socketio.on('request_update_gym')
+def update_view():
+    global gym_host
+    socketio.emit("updating", gym_host.gym_members_statuses_to_dict())
 
 if (__name__ == "__main__"):
     run()

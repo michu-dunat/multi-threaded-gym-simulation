@@ -1,9 +1,10 @@
 from threading import Thread, Condition
 from time import sleep
+from datetime import datetime
 from random import randint, uniform, sample
 
 class GenericMember(Thread):
-    def __init__(self, pid, gym, dw, gm_type):
+    def __init__(self, pid, gym, dw, gm_type, host):
         super().__init__(target=self.run)
         self.pid = pid
         self.condition = Condition()
@@ -14,6 +15,8 @@ class GenericMember(Thread):
         self.gym = gym
         self.list_of_excercises=[]
         self.type = gm_type
+        self.host = host
+        self.status = "Entering gym"
 
         if randint(0,1) == 0:
             self.sex = "m"
@@ -40,9 +43,12 @@ class GenericMember(Thread):
     def exit_gym(self):
         if self.locker_number != -1:
             self.gym.reception.release_locker(self)
-            print(f"{self}: Wychodzę po treningu")
+            print(f"[{datetime.now()}] {self}: Wychodzę po treningu")
+            self.status = "Wychodzę po treningu"
         else:
-            print(f"{self}: Nie chce mi się czekać")
+            print(f"[{datetime.now()}] {self}: Nie chce mi się czekać")
+            self.status = "Nie chce mi się czekać"
+        self.host.remove_member(self)
 
     def enter_gym(self):
         self.locker_number = self.gym.reception.ask_to_enter(self)
@@ -52,8 +58,8 @@ class GenericMember(Thread):
 
 
 class CardioFreak(GenericMember):
-    def __init__(self, pid, gym):
-        super().__init__(pid, gym, randint(40,70), "CardioFreak")
+    def __init__(self, pid, gym, host):
+        super().__init__(pid, gym, randint(40,70), "CardioFreak", host=host)
         l = [
             self.gym.bicycles,
             self.gym.ergometers,
@@ -64,8 +70,8 @@ class CardioFreak(GenericMember):
         self.list_of_excercises = sample(l, len(l))
 
 class CallisctenicsEnjoyer(GenericMember):
-    def __init__(self, pid, gym):
-        super().__init__(pid, gym, randint(85,100), "CallistenicsEnj")
+    def __init__(self, pid, gym, host):
+        super().__init__(pid, gym, randint(85,100), "CallistenicsEnj", host=host)
         l = [
             self.gym.threadmills,
             self.gym.pullup_bars,
@@ -76,8 +82,8 @@ class CallisctenicsEnjoyer(GenericMember):
         self.list_of_excercises = sample(l, len(l))
 
 class GymChad(GenericMember):
-    def __init__(self, pid, gym):
-        super().__init__(pid, gym, randint(100,200), "GymChad")
+    def __init__(self, pid, gym, host):
+        super().__init__(pid, gym, randint(100,200), "GymChad", host=host)
         l = [
             self.gym.benchpresses,
             self.gym.pullup_bars,

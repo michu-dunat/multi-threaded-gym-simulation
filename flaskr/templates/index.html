@@ -84,7 +84,7 @@
                 <div class="col-9">
                     <div class="container-fluid">
                         <row>
-                            <h1>XD</h1>
+                            <h1>Test</h1>
                         </row>
                     </div>
                     
@@ -99,6 +99,21 @@
             socket.emit('connection', {data: 'I\'m connected!'});
         });
     </script>
+
+    <script type="text/javascript" charset="utf-8">
+        socket.on('request_update', () => {
+            socket.emit('request_update_gym');
+        })
+    </script>
+
+<script type="text/javascript" charset="utf-8">
+    socket.on('updating', (data) => {
+        console.log(data)
+        socket.emit('update_received')
+    })
+    
+</script>
+
     <script>
         if(document.getElementsByClassName)
         var dishesArray = Array.from(document.getElementsByClassName('dishes'))

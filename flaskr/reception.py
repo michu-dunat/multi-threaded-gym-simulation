@@ -1,6 +1,6 @@
-from resources import Locker
 from threading import Condition
 import time
+from datetime import datetime
 
 class Reception():
     def __init__(self, locker_count):
@@ -27,10 +27,11 @@ class Reception():
                 if lockers[i]:
                     lockers[i] = False
                     if gym_member.sex == "f":
-                        print(f"[{time.time() - self.time}] Odebrałam szafkę z szatni {gym_member.sex}: {gym_member.pid}")
+                        print(f"[{datetime.now()}] Odebrałam szafkę z szatni {gym_member.sex}: {gym_member.pid}")
+                        gym_member.status = f"Odebrałam szafkę z szatni {gym_member.sex}"
                     else:
-                        print(f"[{time.time() - self.time}] Odebrałem szafkę z szatni {gym_member.sex}: {gym_member.pid}")
-
+                        print(f"[{datetime.now()}] Odebrałem szafkę z szatni {gym_member.sex}: {gym_member.pid}")
+                        gym_member.status = f"Odebrałem szafkę z szatni {gym_member.sex}"
                     return i            
 
     def release_locker(self, gym_member):

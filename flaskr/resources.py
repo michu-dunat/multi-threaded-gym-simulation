@@ -4,36 +4,6 @@ from time import sleep
 from datetime import datetime
 
 
-class LockContextManager():
-    def __init__(self) -> None:
-        pass
-
-    def __enter__(self):
-        print("entering")
-
-    def __exit__(self, type, value, traceback):
-        print("exiting")
-
-class Locker:
-    def __init__(self):
-        self.owner = None
-        self.condition = Condition()
-
-    def release(self):
-        with self.condition:
-            self.owner = None
-            self.condition.notify_all()
-
-    def assign_or_wait(self, gym_member):
-        with self.condition:
-            if self.owner is not None:
-                gym_member.condition.wait()
-                return False
-            else:
-                self.owner = gym_member
-                return True
-
-
 class CardioEquipement:
     def __init__(self, eq_count, name):
         self.condition = Condition()
@@ -68,6 +38,7 @@ class CardioEquipement:
     def release_info(self, g):
         print(f"[{datetime.now()}] {g} released {self}")
 
+
 class Threadmill(CardioEquipement):
     def __init__(self, eq_count):
         super().__init__(eq_count, "Threadmill")
@@ -76,6 +47,7 @@ class Threadmill(CardioEquipement):
 class Ergometer(CardioEquipement):
     def __init__(self, eq_count):
         super().__init__(eq_count, "Ergometer")
+
 
 
 class FreeWeightEx:
@@ -92,7 +64,8 @@ class FreeWeightEx:
         with self.condition:
             while not any(self.array):
                 self.condition.wait()
-                print(f"{g} waiting for {self}")
+                print(f"[{datetime.now()}] {g} waiting for {self}")
+                g.status = f"Waiting for {self}"
             for eq in range(len(self.array)):
                 if self.array[eq]:
                     #print(f"{g.pid} Took {self}")
@@ -101,6 +74,7 @@ class FreeWeightEx:
         with self.weight.condition:
             while not self.weight.avaliable_weight - g.desired_weight > 0:
                 print(f"[{datetime.now()}] {g} could not start lifting on {self}, missing plates, AVALIABLE: {self.weight.avaliable_weight} -> WANTED TO TAKE: {g.desired_weight}")
+                g.status = f"Waiting on plates for {self}"
                 self.weight.condition.wait()
             self.weight.avaliable_weight -= g.desired_weight
         self.take_info(g)
@@ -118,9 +92,10 @@ class FreeWeightEx:
 
     def take_info(self, g):
         print(f"[{datetime.now()}] {g} took {self}, currently avaliable weight: {self.weight.avaliable_weight}")
-
+        g.status = f"Works out on {self}"
     def release_info(self, g):
         print(f"[{datetime.now()}] {g} released {self}, currently avaliable weight: {self.weight.avaliable_weight}")
+        g.status = f"Stopped working out on {self}"
 
 
 class Benchpress(FreeWeightEx):
@@ -137,6 +112,7 @@ class Weight:
 class Bicycle(CardioEquipement):
     def __init__(self, eq_count):
         super().__init__(eq_count, "Bicycle")
+
 
 class CrunchMachine(CardioEquipement):
     def __init__(self, eq_count):
