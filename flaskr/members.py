@@ -48,6 +48,7 @@ class GenericMember(Thread):
         else:
             print(f"[{datetime.now()}] {self}: Nie chce mi się czekać")
             self.status = "Nie chce mi się czekać"
+            sleep(2)
         self.host.remove_member(self)
 
     def enter_gym(self):

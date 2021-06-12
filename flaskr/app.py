@@ -16,6 +16,8 @@ class Host(threading.Thread):
     def __init__(self) -> None:
         super().__init__(target=self.invite_following_customers)
         self.MEMBERS = list()
+        global gym
+        self.gym = gym
         self.condition = threading.Condition()
         self.gym_member_id = 0
 
@@ -46,13 +48,31 @@ class Host(threading.Thread):
     
     def gym_members_statuses_to_dict(self) -> dict:
         with self.condition:
-            x = {
-                f"member-{m.pid}":
-                {
-                    "status": m.status
-                } 
-                for m in self.MEMBERS
+            members =[{
+                "status": m.status,
+                "type": m.type,
+            } for m in self.MEMBERS]
+                
+            
+            resources = {
+                "total_weight": gym.total_weights.avaliable_weight,
+                "threadmills": gym.threadmills.array,
+                "ergometers": gym.ergometers.array,
+                "pullup_bars": gym.pullup_bars.array,
+                "crunch_machines": gym.crunch_machines.array,
+                "elipticals": gym.elipticals.array,
+                "bicycles": gym.bicycles.array,
+                "benchpresses": gym.benchpresses.array,
+                "smith": gym.smith.array,
+                "deadlift": gym.deadlift.array,
             }
+
+            x = {
+                "currentMembersCount": len(self.MEMBERS),
+                "members": members,
+                "resources": resources,
+            }
+
             return x
 
 app = Flask(__name__)
@@ -85,7 +105,10 @@ def run():
 def connected(json):
     print("Initialized connection")
     print(json)
-    socketio.emit('updating', {"start":"gym"})
+    socketio.emit('updating', {
+        "start":"gym",
+        "gymMembers": len(gym_host.MEMBERS)
+    })
 
 @socketio.on("update_received")
 def request_update():
