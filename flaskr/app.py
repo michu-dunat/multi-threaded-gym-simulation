@@ -52,28 +52,29 @@ class Host(threading.Thread):
                 "status": m.status,
                 "type": m.type,
                 "id": m.pid,
-                "time_rem": m.remaining_sleep,
+                "time_rem": m.remaining_sleep,      
                 "total_sleep": m.total_sleep,
             } for m in self.MEMBERS]
                 
             
-            resources = {
-                "total_weight": gym.total_weights.avaliable_weight,
-                "threadmills": gym.threadmills.array,
-                "ergometers": gym.ergometers.array,
-                "pullup_bars": gym.pullup_bars.array,
-                "crunch_machines": gym.crunch_machines.array,
-                "elipticals": gym.elipticals.array,
-                "bicycles": gym.bicycles.array,
-                "benchpresses": gym.benchpresses.array,
-                "smith": gym.smith.array,
-                "deadlift": gym.deadlift.array,
-            }
+            resources = [
+                gym.total_weights.avaliable_weight,
+                gym.total_weights.total,
+                gym.threadmills.generate_string(),
+                gym.ergometers.generate_string(),
+                gym.pullup_bars.generate_string(),
+                gym.crunch_machines.generate_string(),
+                gym.elipticals.generate_string(),
+                gym.bicycles.generate_string(),
+                gym.benchpresses.generate_string(),
+                gym.smith.generate_string(),
+                gym.deadlift.generate_string(),
+            ]
 
             x = {
                 "currentMembersCount": len(self.MEMBERS),
                 "members": members,
-                "resources": resources,
+                "res": resources,
             }
 
             return x

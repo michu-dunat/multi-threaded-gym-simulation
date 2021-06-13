@@ -60,11 +60,11 @@ class GenericMember(Thread):
         if self.locker_number != -1:
             self.gym.reception.release_locker(self)
             print(f"[{datetime.now()}] {self}: Wychodzę po treningu")
-            self.status = "Wychodzę po treningu"
+            self.status = "Leaving after training"
             self.gsleep(5)
         else:
             print(f"[{datetime.now()}] {self}: Nie chce mi się czekać")
-            self.status = "Nie chce mi się czekać"
+            self.status = "I got bored waiting for locker... quitting"
             self.gsleep(5)
         self.host.remove_member(self)
 

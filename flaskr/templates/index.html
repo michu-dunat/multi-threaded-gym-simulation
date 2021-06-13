@@ -11,83 +11,46 @@
         body{
             margin: 0px;
             margin-top: 70px;
-            overflow: auto;
+            overflow: hidden;
+            max-height: 100vh;
         }
 
         .membersCol {
-            position: absolute;
+            max-height: 50vh;
+            position: relative;
             overflow-y: scroll;
+            overflow-x: hidden;
             height: 90%;
         }
+
+        main{
+           max-height: 100%;
+        }
+
     </style>
 </head>
 <body>
-    <header>
-        {% include 'navbar.html' %}
-    </header>
+    {% include 'navbar.html' %}
     <main>
         <div class="container-fluid">
             <div class="row">
-                <div class="col-2">
-                    <div class="container-fluid">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <h3>Members</h3>
-                            </div>
-                        </div>
-                        <div class="container-fluid membersCol">
-                            <div class="row">
-                                <div class="overflow-auto">
-                                    <div class="container-fluid" id="XDDD">
-                                        
-                                    </div>
-                                    <!-- {% for member in context ['members'] %}
-                                    <div class="container-fluid">
-                                        <div class="row">
-                                            <div class="col-md-3">
-                                            <div class="container-fluid">
-                                            <div class="card" style="width: 30rem;">
-                            
-                                                <div class="card-body">
-                                                    <div class="container-fluid">
-                                                    <div class="row">
-                                                        <h5 class="card-title">Member {{member.pid}}</h5>
-                                                            </div>
-                                                                <div class="container-fluid">
-                                                                    <div class="row">
-                                                                        <div class="col-md-4">
-                                                                            <p class="card-text">Status:</p>
-                                                                        </div>
-                                                                        <div class="col-md-6 status">
-                                                                            S
-                                                                        </div>
-                                                                    </div>
-                                                                    <div class="row">
-                                                                        <div class="col-md-4">
-                                                                        <p class="card-text">Progress:</p>
-                                                                        </div>
-                                                                        <div class="progress" id="member-{{member.pid}}">
-                                                                            <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="3.5"></div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    {% endfor %} -->
-                                </div>
+                <div class="col-4">
+                    <h3>Members</h3>
+                    <div class="membersCol">
+                        <div class="overflow-auto">
+                            <div id="membs">
+                                
                             </div>
                         </div>
                     </div>
                 </div>
                     
-                <div class="col-9">
+                <div class="col-8">
                     <div class="container-fluid">
-                        <row>
-                            <h1>Test</h1>
-                        </row>
+                        <h3>Equipment</h3>
+                        <div class="container-fluid" id="equipment">
+                            
+                        </div>
                     </div>
                     
                 </div>
@@ -105,82 +68,181 @@
 <script type="text/javascript" charset="utf-8">
 
     const refreshHTML = () => {
-            el = document.getElementById('XDDD')
+            el = document.getElementById('membs')
+            eq = document.getElementById("equipment")
+            eq.innerHTML = '';
             el.innerHTML = '';
             for(var i = 0; i < window.membersCount; i++){
                 container = document.createElement("div")
-                container.innerHTML = `<div class="container-fluid">
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                <div class="container-fluid">
-                                                <div class="card" style="width: 30rem;">
-                                
-                                                    <div class="card-body">
-                                                        <div class="container-fluid">
-                                                        <div class="row">
-                                                            <h5 class="card-title">Member ` + window.members[i].id + `</h5>
-                                                                </div>
-                                                                    <div class="container-fluid">
-                                                                        <div class="row">
-                                                                            <div class="col-md-4">
-                                                                                <p class="card-text">Status:</p>
-                                                                            </div>
-                                                                            <div class="col-md-6 status">
-                                                                                S
-                                                                            </div>
-                                                                        </div>
-                                                                        <div class="row">
-                                                                            <div class="col-md-6">
-                                                                            <p class="card-text">Progress: `+ window.members[i].time_rem + `/`+ window.members[i].total_sleep + `</p>
-                                                                            </div>
-                                                                            <div class="progress" style="height: 20px;">
-                                                                                <div class="progress-bar" role="progressbar" style="width: `+ window.members[i].time_rem/window.members[i].total_sleep*100 +`%;" aria-valuenow="`+ window.members[i].time_rem*100 +`" aria-valuemin="0" aria-valuemax="`+ window.members[i].total_sleep*100 +`"></div>
-                                                                            </div>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>`
+                container.innerHTML = `<div class="container-fluid" style="padding-right: 0 !important; padding-left: 0 !important;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Member ` + window.members[i].id + `</h5>
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <p class="card-text">Type: `+ window.members[i].type + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            
+                            <div class="col-12">
+                                <p class="card-text">Status: ` + window.members[i].status + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                            <p class="card-text">Remaining: `+ window.members[i].time_rem + `/`+ window.members[i].total_sleep + `</p>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar" style="width: `+ window.members[i].time_rem/window.members[i].total_sleep*100 +`%;" aria-valuenow="`+ window.members[i].time_rem*100 +`" aria-valuemin="0" aria-valuemax="`+ window.members[i].total_sleep*100 +`"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`
                 el.appendChild(container)
             }
-        }
+            container_eq = document.createElement("div")
+            container_eq.innerHTML = `<div class="container-fluid" style="padding-right: 0 !important; padding-left: 0 !important;">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Weights:</h4>
+                                <p>` + window.eqp1 + `/`+ window.eqp11 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Threadmills:</h4> 
+                                <p>` + window.eqp2 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Ergometers: </h4>
+                                <p>` + window.eqp3 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Pull up bars: </h4> 
+                                <p>` + window.eqp4 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Crunch machines: </h4> 
+                                <p>` + window.eqp5 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Elipticals: </h4> 
+                                <p>` + window.eqp6 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Bicycles: </h4> 
+                                <p>` + window.eqp7 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Benchpresses:</h4> 
+                                <p>` + window.eqp8 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Smith machines: </h4> 
+                                <p>` + window.eqp9 + `</p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <h4 class="card-text">Deadlift: </h4>
+                                <p>` + window.eqp10 + `</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>`
+            eq.appendChild(container_eq)
+}
 
     const refreshSTATUS = (data) => {
-        window.statusArr = Array.from(document.getElementsByClassName('status'))
-        console.log(window.statusArr);
+        // window.statusArr = Array.from(document.getElementsByClassName('status'))
+        // console.log(window.statusArr);
         for(var j=0; j<window.membersCount; j++){
             console.log(window.members[0]);
-            window.statusArr[j].innerHTML = data.members[j].status;
+            // window.statusArr[j].innerHTML = data.members[j].status;
         }
     }
 
     socket.on('updating', (data) => {
-        //console.log(data)
         window.membersCount = data.currentMembersCount
+        window.eqCount = 100 //XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
         window.members = data.members
-        console.log(window.membersCount);
-        refreshHTML()
-        refreshSTATUS(data)
+        //console.log(data.currentMembersCount);
+        //console.log(data.members);
+        console.log(data.res);
+        if(typeof data.res !== "undefined"){
+            window.eqp1 = data.res[0];
+            window.eqp11 = data.res[1];
+            window.eqp2 = data.res[2];
+            window.eqp3 = data.res[3];
+            window.eqp4 = data.res[4];
+            window.eqp5 = data.res[5];
+            window.eqp6 = data.res[6];
+            window.eqp7 = data.res[7];
+            window.eqp8 = data.res[8];
+            window.eqp9 = data.res[9];
+            window.eqp10 = data.res[10];
+            console.log(window.membersCount);
+            
+            refreshHTML()
+            refreshSTATUS(data)
+        }
+        
     })
 </script>
 
 <script>
     window.setInterval(() => {
         socket.emit('request_update_gym')
-    }, 500)
+    }, 999)
 </script>
 
-    <script>        
-        socket.on('initialize', (data) => {
-            window.times = Array(parseInt(data.data))
-            window.times.fill(0)
-            console.log(window.times)
-            console.log(data.data)
-            socket.emit('run');
-        });
-    </script>
+<script>
+    window.onload = () => {
+        let height = window.innerHeight
+        document.querySelector(".membersCol").style.maxHeight = (height - 88) + "px"; 
+    };
+</script>
+
+<script>        
+    socket.on('initialize', (data) => {
+        window.times = Array(parseInt(data.data))
+        window.times.fill(0)
+        console.log(window.times)
+        console.log(data.data)
+        socket.emit('run');
+    });
+</script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 </body>
 </html>

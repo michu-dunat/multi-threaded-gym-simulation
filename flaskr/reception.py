@@ -28,10 +28,10 @@ class Reception():
                     lockers[i] = False
                     if gym_member.sex == "f":
                         print(f"[{datetime.now()}] Odebrałam szafkę z szatni {gym_member.sex}: {gym_member.pid}")
-                        gym_member.status = f"Odebrałam szafkę z szatni {gym_member.sex}"
+                        gym_member.status = f"I collected locker from {gym_member.sex} locker room"
                     else:
                         print(f"[{datetime.now()}] Odebrałem szafkę z szatni {gym_member.sex}: {gym_member.pid}")
-                        gym_member.status = f"Odebrałem szafkę z szatni {gym_member.sex}"
+                        gym_member.status = f"I collected locker from {gym_member.sex} locker room"
                     return i            
 
     def release_locker(self, gym_member):

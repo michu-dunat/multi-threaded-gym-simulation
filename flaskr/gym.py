@@ -1,7 +1,7 @@
 from reception import Reception
 from resources import Threadmill, Benchpress, Ergometer, PullUpBar, Eliptical, Bicycle, CrunchMachine, Weight, Deadlift, Smith_machine
 
-LOCKER_COUNT = 10
+LOCKER_COUNT = 20
 
 class Gym:
     def __init__(self) -> None:

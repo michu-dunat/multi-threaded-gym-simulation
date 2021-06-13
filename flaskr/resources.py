@@ -9,6 +9,7 @@ class CardioEquipement:
         self.condition = Condition()
         self.array = [True for _ in range(eq_count)]
         self.name = name
+        self.taken_by = ["None" for _ in range(eq_count)]
     
     def __str__(self) -> str:
         return self.name
@@ -17,12 +18,15 @@ class CardioEquipement:
         with self.condition:
             while not any(self.array):
                 self.condition.wait()
+                g.status = f"Waiting for {self}"
         
             for eq in range(len(self.array)):
                 if self.array[eq]:
                     self.take_info(g)
                     #print(f"[{datetime.now()}]{g} took {self}")
-                    self.array[eq] = False 
+                    self.array[eq] = False
+                    self.taken_by[eq] = g.pid
+                    g.eid = eq
                     return eq
 
     def stop_training(self, g):
@@ -30,12 +34,22 @@ class CardioEquipement:
             #print(g.pid, f" Zwolnił {self}")
             self.release_info(g)
             self.array[g.eid] = True
+            self.taken_by[g.eid] = "None"
             self.condition.notify_all()
 
+    def generate_string(self):
+        string_info = "Taken by: ["
+        for i in self.taken_by:
+            string_info+=f"{i},"
+        string_info+="]"
+        return string_info
+
     def take_info(self, g):
+        g.status = f"Works out on {self}"
         print(f"[{datetime.now()}] {g} took {self}")
 
     def release_info(self, g):
+        g.status = f"Stopped working out on {self}"
         print(f"[{datetime.now()}] {g} released {self}")
 
 
@@ -56,6 +70,7 @@ class FreeWeightEx:
         self.array = [True for _ in range(eq_count)]
         self.name = name
         self.weight = all_plates
+        self.taken_by = ["None" for _ in range(eq_count)]
     
     def __str__(self) -> str:
         return self.name
@@ -69,7 +84,9 @@ class FreeWeightEx:
             for eq in range(len(self.array)):
                 if self.array[eq]:
                     #print(f"{g.pid} Took {self}")
+                    self.taken_by[eq] = g.pid
                     self.array[eq] = False
+                    g.eid = eq
                     break
         with self.weight.condition:
             while not self.weight.avaliable_weight - g.desired_weight > 0:
@@ -88,7 +105,15 @@ class FreeWeightEx:
 
         with self.condition:
             self.array[g.eid] = True
+            self.taken_by[g.eid] = "None"
             self.condition.notify_all()
+    
+    def generate_string(self):
+        string_info = "Taken by: ["
+        for i in self.taken_by:
+            string_info+=(f"{i},")
+        string_info+="]"
+        return string_info
 
     def take_info(self, g):
         print(f"[{datetime.now()}] {g} took {self}, currently avaliable weight: {self.weight.avaliable_weight}")
@@ -106,6 +131,7 @@ class Benchpress(FreeWeightEx):
 class Weight:
     def __init__(self, total_weight) -> None:
         self.avaliable_weight = total_weight
+        self.total = total_weight
         self.condition = Condition()
 
 
