@@ -118,7 +118,7 @@
                                                     <div class="card-body">
                                                         <div class="container-fluid">
                                                         <div class="row">
-                                                            <h5 class="card-title">Member ` + i + `</h5>
+                                                            <h5 class="card-title">Member ` + window.members[i].id + `</h5>
                                                                 </div>
                                                                     <div class="container-fluid">
                                                                         <div class="row">
@@ -130,11 +130,11 @@
                                                                             </div>
                                                                         </div>
                                                                         <div class="row">
-                                                                            <div class="col-md-4">
-                                                                            <p class="card-text">Progress:</p>
+                                                                            <div class="col-md-6">
+                                                                            <p class="card-text">Progress: `+ window.members[i].time_rem + `/`+ window.members[i].total_sleep + `</p>
                                                                             </div>
-                                                                            <div class="progress" id="member`+ i +`">
-                                                                                <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="3.5"></div>
+                                                                            <div class="progress" style="height: 20px;">
+                                                                                <div class="progress-bar" role="progressbar" style="width: `+ window.members[i].time_rem/window.members[i].total_sleep*100 +`%;" aria-valuenow="`+ window.members[i].time_rem*100 +`" aria-valuemin="0" aria-valuemax="`+ window.members[i].total_sleep*100 +`"></div>
                                                                             </div>
                                                                         </div>
                                                                     </div>
@@ -164,48 +164,23 @@
         refreshHTML()
         refreshSTATUS(data)
     })
-    
 </script>
 
 <script>
-
     window.setInterval(() => {
         socket.emit('request_update_gym')
-    }, 1000)
-
+    }, 500)
 </script>
 
-    <script>
-        if(document.getElementsByClassName)
-        var dishesArray = Array.from(document.getElementsByClassName('dishes'))
-        var statusArray = Array.from(document.getElementsByClassName('status'))
-        var progressArray = Array.from(document.getElementsByClassName('progress'))
-        
+    <script>        
         socket.on('initialize', (data) => {
             window.times = Array(parseInt(data.data))
             window.times.fill(0)
             console.log(window.times)
             console.log(data.data)
             socket.emit('run');
-            
         });
-        </script>
-    <script>
-        
-        function update(){
-
-        };
-
-
-        socket.on('update', (data) => {
-            console.log(window.times)
-            window.statusArray[data.pid].innerHTML = data.status
-            window.dishesArray[data.pid].innerHTML = data.dishes
-            window.forksArray[data.pid].innerHTML = data.lefts
-            window.forksArray[data.right].innerHTML = data.rights
-            
-        });
-        </script>
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js" integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0" crossorigin="anonymous"></script>
 </body>
 </html>

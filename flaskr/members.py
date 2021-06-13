@@ -17,27 +17,43 @@ class GenericMember(Thread):
         self.type = gm_type
         self.host = host
         self.status = "Entering gym"
+        self.total_sleep = 0
+        self.remaining_sleep = 0
+        self.is_remaiming_time_set = False
 
         if randint(0,1) == 0:
             self.sex = "m"
         else: 
             self.sex = "f"
 
+    def gsleep(self, sleeping_period):
+        self.total_sleep = round(sleeping_period,2)
+        self.remaining_sleep = round(sleeping_period,2)
+        while not self.remaining_sleep <= 0:
+            if self.remaining_sleep > 0.2:
+                sleep(0.2)
+                self.remaining_sleep -= 0.2
+                self.remaining_sleep = round(self.remaining_sleep,2)
+            else:
+                sleep(self.remaining_sleep)
+                self.remaining_sleep -= self.remaining_sleep
+                self.total_sleep = 0
+
     def run(self):
         self.enter_gym()
         if self.locker_number != -1:
-            sleep(uniform(2,3))
+            self.gsleep(uniform(2,3))
             self.execute_training_plan()
-            sleep(uniform(3,4))
+            self.gsleep(uniform(3,4))
         self.exit_gym()
 
     def execute_training_plan(self):
         for ex in self.list_of_excercises:
-            self.train(ex,1,10)
+            self.train(ex,8,10)
 
     def train(self, equipment, min_occupation_time, max_occupation_time):
         equipment.start_training(self)
-        sleep(uniform(min_occupation_time,max_occupation_time))
+        self.gsleep(uniform(min_occupation_time,max_occupation_time))
         equipment.stop_training(self)
 
     def exit_gym(self):
@@ -45,10 +61,11 @@ class GenericMember(Thread):
             self.gym.reception.release_locker(self)
             print(f"[{datetime.now()}] {self}: Wychodzę po treningu")
             self.status = "Wychodzę po treningu"
+            self.gsleep(5)
         else:
             print(f"[{datetime.now()}] {self}: Nie chce mi się czekać")
             self.status = "Nie chce mi się czekać"
-            sleep(2)
+            self.gsleep(5)
         self.host.remove_member(self)
 
     def enter_gym(self):
@@ -86,7 +103,6 @@ class GymChad(GenericMember):
     def __init__(self, pid, gym, host):
         super().__init__(pid, gym, randint(100,200), "GymChad", host=host)
         l = [
-            self.gym.benchpresses,
             self.gym.pullup_bars,
             self.gym.crunch_machines,
             self.gym.benchpresses,

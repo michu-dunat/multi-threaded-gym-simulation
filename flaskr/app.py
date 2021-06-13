@@ -51,6 +51,9 @@ class Host(threading.Thread):
             members =[{
                 "status": m.status,
                 "type": m.type,
+                "id": m.pid,
+                "time_rem": m.remaining_sleep,
+                "total_sleep": m.total_sleep,
             } for m in self.MEMBERS]
                 
             
