@@ -29,5 +29,5 @@ export FLASK_APP=app.py
 
 ### Run application
 ```
-flask run
+./skrypt.sh
 ```
